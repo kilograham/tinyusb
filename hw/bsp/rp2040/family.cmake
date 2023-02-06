@@ -308,7 +308,7 @@ if (NOT TARGET _rp2040_family_inclusion_marker)
 						${PICO_TINYUSB_PATH}/hw/mcu/raspberry_pi/Pico-PIO-USB/src/pio_usb_host.c
 						${PICO_TINYUSB_PATH}/src/portable/raspberrypi/pio_usb/hcd_pio_usb.c
 						PROPERTIES
-						COMPILE_FLAGS "-Wno-conversion -Wno-cast-qual")
+						COMPILE_FLAGS "-Wno-conversion -Wno-cast-qual -Wno-attributes")
 			endif()
 		endif()
 	endfunction()
