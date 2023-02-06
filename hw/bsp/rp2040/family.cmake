@@ -172,14 +172,10 @@ if (NOT TARGET _rp2040_family_inclusion_marker)
 
 		# For rp2040 enable pico-pio-usb
 		if (TARGET tinyusb_pico_pio_usb)
-			family_add_pico_pio_usb(${PROJECT})
-
-			# due to warnings from Pico-PIO-USB
-			target_compile_options(${PROJECT} PUBLIC
-					-Wno-error=cast-qual
-					-Wno-error=sign-conversion
-					-Wno-error=conversion
-					)
+			# code does not compile with GCC 12+
+			if (NOT (CMAKE_C_COMPILER_ID STREQUAL "GNU" AND CMAKE_C_COMPILER_VERSION VERSION_GREATER_EQUAL 12.0))
+				family_add_pico_pio_usb(${PROJECT})
+			endif()
 		endif()
 	endfunction()
 
@@ -291,6 +287,29 @@ if (NOT TARGET _rp2040_family_inclusion_marker)
 					${PICO_TINYUSB_PATH}/lib/fatfs/source/ff.c
 					PROPERTIES
 					COMPILE_FLAGS "-Wno-conversion -Wno-cast-qual")
+
+			set_source_files_properties(
+					${PICO_TINYUSB_PATH}/lib/lwip/src/core/tcp_in.c
+					${PICO_TINYUSB_PATH}/lib/lwip/src/core/tcp_out.c
+					PROPERTIES
+					COMPILE_FLAGS "-Wno-conversion")
+
+			set_source_files_properties(
+					${PICO_TINYUSB_PATH}/lib/networking/dnserver.c
+					${PICO_TINYUSB_PATH}/lib/networking/dhserver.c
+					${PICO_TINYUSB_PATH}/lib/networking/rndis_reports.c
+					PROPERTIES
+					COMPILE_FLAGS "-Wno-conversion -Wno-sign-conversion")
+
+			if (TARGET tinyusb_pico_pio_usb)
+				set_source_files_properties(
+						${PICO_TINYUSB_PATH}/hw/mcu/raspberry_pi/Pico-PIO-USB/src/pio_usb_device.c
+						${PICO_TINYUSB_PATH}/hw/mcu/raspberry_pi/Pico-PIO-USB/src/pio_usb.c
+						${PICO_TINYUSB_PATH}/hw/mcu/raspberry_pi/Pico-PIO-USB/src/pio_usb_host.c
+						${PICO_TINYUSB_PATH}/src/portable/raspberrypi/pio_usb/hcd_pio_usb.c
+						PROPERTIES
+						COMPILE_FLAGS "-Wno-conversion -Wno-cast-qual")
+			endif()
 		endif()
 	endfunction()
 endif()
